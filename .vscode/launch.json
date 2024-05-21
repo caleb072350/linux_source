@@ -5,7 +5,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "args": "fs/bitmap.c",
+            "args": "include/asm/segment.h",
             "console": "integratedTerminal"
         }
     ]

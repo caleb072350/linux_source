@@ -16,10 +16,13 @@ def process_file(input_file):
     try:
         with open(input_file, 'r', encoding='utf-8') as infile, open(tmp_path, 'w', encoding='utf-8') as outfile:
             for line in infile:
+                raw = line
                 line = line.strip()  # 去掉行首空格，行尾的换行符
                 if line.startswith(tuple(str(i) for i in range(10))):  # 检查是否以数字开头
                     line = remove_digit_prefix(line)
-                outfile.write(line + '\n')  # 重新插入换行符
+                    outfile.write(line + '\n')  # 重新插入换行符
+                else:
+                    outfile.write(raw)
         # 将临时文件的内容覆盖原文件
         os.replace(tmp_path, input_file)
     finally:

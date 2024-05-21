@@ -25,8 +25,8 @@
 #endif 
 
 /* Root device at bootup. */
-#if     defined(LINUS_HD)
-#define ROOT_DEV 0x306
+#if defined(LINUS_HD)
+// #define ROOT_DEV 0x306
 #elif   defined(LASU_HD)
 #define ROOT_DEV 0x302
 #else
