@@ -27,7 +27,7 @@
 #define WRITE 1
 #define READA 2         /* read-ahead - don't pause */
 
-void buffer_init(long buffer_end);
+void buffer_init();
 
 #define MAJOR(a) (((unsigned)(a))>>8)
 #define MINOR(a) ((a)&0xff)

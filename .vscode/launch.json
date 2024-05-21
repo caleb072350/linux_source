@@ -5,7 +5,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "args": "include/asm/segment.h",
+            "args": "fs/exec.c",
             "console": "integratedTerminal"
         }
     ]

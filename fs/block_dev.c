@@ -58,7 +58,7 @@ int block_read(int dev, unsigned long * pos, char * buf, int count)
         if (chars > count)
         chars = count;
         if (!(bh = breada(dev,block,block+1,block+2,-1)))
-        return read?read:-EIO;
+            return read?read:-EIO;
         block++;
         p = offset + bh->b_data;
         offset = 0;
