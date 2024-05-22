@@ -47,7 +47,7 @@ void sync_inodes(void)
     {
         wait_on_inode(inode);
         if (inode->i_dirt && !inode->i_pipe)
-            write_inode(inode);  // 注意，这里只是将 inode 写入到 buffer 中，并没有写入磁盘
+            write_inode(inode); // 注意，这里只是将 inode 写入到 buffer 中，并没有写入磁盘
     }
 }
 
