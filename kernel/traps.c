@@ -179,6 +179,7 @@ void do_reserved(long esp, long error_code)
     die("reserved (15,17-47) error", esp, error_code);
 }
 
+/* 初始化中断处理.为不同类型的中断设置中断门或处理门 */
 void trap_init(void)
 {
     int i;

@@ -20,8 +20,8 @@
 
 #include "../include/signal.h"
 
-#define _S(nr) (1 << ((nr) - 1))
-#define _BLOCKABLE (~(_S(SIGKILL) | _S(SIGSTOP)))
+#define _S(nr) (1 << ((nr) - 1))  //将1左移(nr-1)位,生成一个对应位数为nr的二进制位掩码,这种位掩码通常用于对特定位进行设置或清除操作
+#define _BLOCKABLE (~(_S(SIGKILL) | _S(SIGSTOP)))  // 可以被阻塞的信号集合
 
 void show_task(int nr, struct task_struct *p)
 {
@@ -60,7 +60,7 @@ long startup_time = 0;
 struct task_struct *current = &(init_task.task);
 struct task_struct *last_task_used_math = NULL;
 
-struct task_struct *task[NR_TASKS] = {
+struct task_struct *task[NR_TASKS] = {   // 表示系统中所有的进程,第0个位置为启动进程
     &(init_task.task),
 };
 
@@ -418,6 +418,7 @@ int sys_nice(long increment)
     return 0;
 }
 
+/* 初始化调度器相关的设置 */
 void sched_init(void)
 {
     int i;
@@ -425,10 +426,10 @@ void sched_init(void)
 
     if (sizeof(struct sigaction) != 16)
         panic("Struct sigaction MUST be 16 bytes");
-    set_tss_desc(gdt + FIRST_TSS_ENTRY, &(init_task.task.tss));
-    set_ldt_desc(gdt + FIRST_LDT_ENTRY, &(init_task.task.ldt));
-    p = gdt + 2 + FIRST_TSS_ENTRY;
-    for (i = 1; i < NR_TASKS; i++)
+    set_tss_desc(gdt + FIRST_TSS_ENTRY, &(init_task.task.tss)); // 设置任务状态段描述符
+    set_ldt_desc(gdt + FIRST_LDT_ENTRY, &(init_task.task.ldt)); // 设置局部描述符表描述符
+    p = gdt + 2 + FIRST_TSS_ENTRY; // p指向任务数组的起始位置
+    for (i = 1; i < NR_TASKS; i++)  // 初始化置为空状态  
     {
         task[i] = NULL;
         p->a = p->b = 0;
@@ -441,7 +442,7 @@ void sched_init(void)
     outb_p(0x36, 0x43);         /* binary, mode 3, LSB/MSB, ch 0 */
     outb_p(LATCH & 0xff, 0x40); /* LSB */
     outb(LATCH >> 8, 0x40);     /* MSB */
-    set_intr_gate(0x20, &timer_interrupt);
+    set_intr_gate(0x20, &timer_interrupt); // 设置定时器中断处理函数
     outb(inb_p(0x21) & ~0x01, 0x21);
-    set_system_gate(0x80, &system_call);
+    set_system_gate(0x80, &system_call);   // 设置系统调用门
 }

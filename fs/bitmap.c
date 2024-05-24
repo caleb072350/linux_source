@@ -1,11 +1,12 @@
 /* bitmap.c contains the code that handles the inode and block bitmaps */
 
-#include "include/string.h"
+#include "../include/string.h"
 
-#include "include/linux/sched.h"
-#include "include/linux/kernel.h"
+#include "../include/linux/sched.h"
+#include "../include/linux/kernel.h"
+#include "../include/linux/fs.h"
 
-/* 重复将0写入指定地址来实现内存块的清空操作 */
+/* 重复将0写入指定地址来实现内存块的清空操作,将1024个字节置为0 */
 #define clear_block(addr)     \
     __asm__("cld\n\t"         \
             "rep\n\t"         \
@@ -41,19 +42,20 @@ __asm__("cld\n" \
         :"=c" (__res):"c" (0),"S" (addr):"ax","dx","si"); \
 __res; })
 
+/* 释放设备的block块 */
 void free_block(int dev, int block)
 {
     struct super_block *sb;
     struct buffer_head *bh;
 
-    if (!(sb = get_super(dev))) // 获取硬件设备的super_block块，如果失败则报错
+    if (!(sb = get_super(dev))) // 获取硬件设备的super_block块，如果失败则触发panic
         panic("trying to free block on nonexistent device");
-    if (block < sb->s_firstdatazone || block >= sb->s_nzones)
+    if (block < sb->s_firstdatazone || block >= sb->s_nzones) /* 校验待释放的block块是否在数据区 */
         panic("trying to free block not in datazone");
     bh = get_hash_table(dev, block);
     if (bh)
     {
-        if (bh->b_count != 1)
+        if (bh->b_count != 1) // 有其他进程在使用这个块
         {
             printk("trying to free block (%04x:%d), count=%d\n",
                    dev, block, bh->b_count);
@@ -61,17 +63,18 @@ void free_block(int dev, int block)
         }
         bh->b_dirt = 0;
         bh->b_uptodate = 0;
-        brelse(bh);
+        brelse(bh); // 释放bh,本进程不再使用
     }
-    block -= sb->s_firstdatazone - 1;
-    if (clear_bit(block & 8191, sb->s_zmap[block / 8192]->b_data))
+    block -= sb->s_firstdatazone - 1; // 计算块号在数据区域内的偏移
+    if (clear_bit(block & 8191, sb->s_zmap[block / 8192]->b_data)) // 检查并清除位图中对应块的位
     {
         printk("block (%04x:%d) ", dev, block + sb->s_firstdatazone - 1);
         panic("free_block: bit already cleared");
     }
-    sb->s_zmap[block / 8192]->b_dirt = 1;
+    sb->s_zmap[block / 8192]->b_dirt = 1; // 将位图缓冲区块标记为脏
 }
 
+/* 在指定设备上分配一个新的数据块,并返回该数据块的块号 */
 int new_block(int dev)
 {
     struct buffer_head *bh;

@@ -14,10 +14,12 @@
  * and all interrupts pertaining to serial IO.
  */
 
-#include <linux/tty.h>
-#include <linux/sched.h>
-#include <asm/system.h>
-#include <asm/io.h>
+#include "../include/linux/tty.h"
+#include "../include/linux/sched.h"
+#include "../include/asm/system.h"
+#include "../include/asm/io.h"
+#include "../include/linux/tty.h"
+#include "../include/linux/head.h"
 
 #define WAKEUP_CHARS (TTY_BUF_SIZE / 4)
 

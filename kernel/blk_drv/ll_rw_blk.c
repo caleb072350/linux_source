@@ -11,7 +11,7 @@
 #include "../../include/linux/sched.h"
 #include "../../include/linux/kernel.h"
 #include "../../include/asm/system.h"
-
+#include "../../include/linux/fs.h"
 #include "blk.h"
 
 /*
@@ -138,6 +138,7 @@ void ll_rw_block(int rw, struct buffer_head *bh)
     make_request(major, rw, bh);
 }
 
+/* 初始化块设备请求结构体数组 */
 void blk_dev_init(void)
 {
     int i;

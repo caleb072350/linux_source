@@ -19,7 +19,7 @@
  */
 
 #include "../include/stdarg.h"
-
+#include "../include/linux/fs.h"
 #include "../include/linux/config.h"
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
@@ -164,7 +164,7 @@ static inline void insert_into_queues(struct buffer_head *bh)
 static struct buffer_head *find_buffer(int dev, int block)
 {
     struct buffer_head *tmp;
-
+    /* tmp 为hash_table中与dev和block相对应的 buffer_head* */
     for (tmp = hash(dev, block); tmp != NULL; tmp = tmp->b_next)
         if (tmp->b_dev == dev && tmp->b_blocknr == block)
             return tmp;
@@ -198,11 +198,10 @@ struct buffer_head *get_hash_table(int dev, int block)
  * Ok, this is getblk, and it isn't very clear, again to hinder
  * race-conditions. Most of the code is seldom used, (ie repeating),
  * so it should be much more efficient than it looks.
- *
- * The algoritm is changed: better, and an elusive bug removed.
- *              LBT 11.11.91
  */
+/* 计算缓冲块的"坏度", 通过将脏标志位左移1位加上锁标志位来计算"坏度".通过这个值可以评估缓冲块的状态 */
 #define BADNESS(bh) (((bh)->b_dirt << 1) + (bh)->b_lock)
+
 struct buffer_head *getblk(int dev, int block)
 {
     struct buffer_head *tmp, *bh;
@@ -253,6 +252,7 @@ repeat:
     return bh;
 }
 
+/* 在当前进程释放掉 buffer_head* */
 void brelse(struct buffer_head *buf)
 {
     if (!buf)
@@ -322,8 +322,8 @@ void buffer_init(long buffer_end)
     void *b;
     int i;
 
-    if (buffer_end == 1 << 20)
-        b = (void *)(640 * 1024);
+    if (buffer_end == 1 << 20)     // 1MB
+        b = (void *)(640 * 1024);  // 640KB
     else
         b = (void *)buffer_end;
     while ((b -= BLOCK_SIZE) >= ((void *)(h + 1)))

@@ -5,7 +5,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
-            "args": "boot/gas_convert.s",
+            "args": "include/linux/fs.h",
             "console": "integratedTerminal"
         }
     ]

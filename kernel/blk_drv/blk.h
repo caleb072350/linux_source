@@ -14,13 +14,13 @@ struct request
 {
     int dev; /* -1 if no request */
     int cmd; /* READ or WRITE */
-    int errors;
-    unsigned long sector;
-    unsigned long nr_sectors;
-    char *buffer;
-    struct task_struct *waiting;
-    struct buffer_head *bh;
-    struct request *next;
+    int errors;  /* 请求过程中发生的错误次数 */
+    unsigned long sector; /* 请求的起始扇区号 */
+    unsigned long nr_sectors; /* 请求的扇区数量 */
+    char *buffer;            /* 指向存储请求数据的缓冲区 */
+    struct task_struct *waiting; /* 等待处理该请求的进程队列 */
+    struct buffer_head *bh;  /* 指向与请求相关的缓冲块头结构体 */
+    struct request *next;   /* 指向在一个请求结构体,构建请求链表 */
 };
 
 #define IN_ORDER(s1, s2)                                 \

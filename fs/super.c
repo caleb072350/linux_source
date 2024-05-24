@@ -5,15 +5,15 @@
  */
 
 /*
- * super.c contains code to handle the super-block tables.
+ * super.c contains code to handle the super-block tables.  这个文件主要是处理超级块表
  */
-#include "include/linux/config.h"
-#include "include/linux/sched.h"
-#include "include/linux/kernel.h"
-#include "include/asm/system.h"
-
-#include "include/errno.h"
-#include "include/sys/stat.h"
+#include "../include/linux/config.h"
+#include "../include/linux/sched.h"
+#include "../include/linux/kernel.h"
+#include "../include/asm/system.h"
+#include "../include/linux/fs.h"
+#include "../include/errno.h"
+#include "../include/sys/stat.h"
 
 int sync_dev(int dev);
 void wait_for_keypress(void);
@@ -24,18 +24,18 @@ register int __res __asm__("ax"); \
 __asm__("bt %2,%3;setb %%al":"=a" (__res):"a" (0),"r" (bitnr),"m" (*(addr))); \
 __res; })
 
-struct super_block super_block[NR_SUPER];
+struct super_block super_block[NR_SUPER];       /* 保存设备超级块信息的全局变量 */
 /* this is initialized in init/main.c */
 int ROOT_DEV = 0;
 
 /* 给 super_block 加锁，即将s_lock字段置为1，但要判断super_block是否被其他进程锁住，如果锁住，则自旋等待，直到锁被释放 */
 static void lock_super(struct super_block *sb)
 {
-    cli();
+    cli(); /* 禁用中断, 这条汇编用来清除中断标志位,即关闭中断.确保在执行关键代码时,不会被中断打断,保证代码的原子性和可靠性. */
     while (sb->s_lock) // 自旋
         sleep_on(&(sb->s_wait));
     sb->s_lock = 1;
-    sti();
+    sti(); /* 重新启用中断,退出临界区 */
 }
 
 /* 释放 super_block 的锁 */
@@ -105,7 +105,7 @@ void put_super(int dev)
     return;
 }
 
-/* 读取设备dev的super_block块信息 */
+/* 读取设备dev的超级块信息 */
 static struct super_block *read_super(int dev)
 {
     struct super_block *s;

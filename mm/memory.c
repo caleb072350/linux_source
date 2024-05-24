@@ -263,10 +263,10 @@ void mem_init(long start_mem, long end_mem)
 
     HIGH_MEMORY = end_mem;   // 将系统可用的最高内存设置为end_mem
     for (i = 0; i < PAGING_PAGES; i++)
-        mem_map[i] = USED;   // mem_map 用于跟踪系统中每一页内存的状态，初始化的时候将其标记为已使用
-    i = MAP_NR(start_mem);   // 计算start_mem对应的页号，这里应该是物理内存的页号
+        mem_map[i] = USED;   // mem_map 用于跟踪系统中每一页内存的状态，初始化的时候将其标记为已使用, mem_map被static修饰,存储在数据段 .data
+    i = MAP_NR(start_mem);   // 计算start_mem对应的页号，这里是物理内存的页号, 物理内存低于0x100000的地址用于其他用途
     end_mem -= start_mem;    // 这两行代码计算内存范围的页数，并存储在end_mem中
-    end_mem >>= 12;          // 这里12是因为在x86架构下，一个页面大小是4Kb，即2^12字节
+    end_mem >>= 12;          // 这里12是因为在x86架构下，一个页面大小是4KB，即2^12字节     内存和硬盘存储容量以字节(Byte)为单位,网络传输中,以bit衡量速度.
     while (end_mem-- > 0)    // 重新遍历所有的内存页，标记为未使用
         mem_map[i++] = 0;
 }
