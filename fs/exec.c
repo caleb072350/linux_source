@@ -25,6 +25,7 @@ extern int sys_close(int fd);
  */
 #define MAX_ARG_PAGES 32
 
+/* 汇编级别内存块的复制操作 */
 #define cp_block(from, to)                    \
     __asm__("pushl $0x10\n\t"                 \
             "pushl $0x17\n\t"                 \
@@ -49,7 +50,7 @@ int read_head(struct m_inode *inode, int blocks)
         blocks = 6;
     for (count = 0; count < blocks; count++)
     {
-        if (!inode->i_zone[count + 1])
+        if (!inode->i_zone[count + 1]) // inode->i_zone[count + 1] 存的是block号码，一个inode最多存10个block号码，对应硬盘中的10个block
             continue;
         if (!(bh = bread(inode->i_dev, inode->i_zone[count + 1])))
             return -1;

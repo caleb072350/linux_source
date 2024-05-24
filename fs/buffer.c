@@ -212,7 +212,7 @@ repeat:
     tmp = free_list;
     do
     {
-        if (tmp->b_count)
+        if (tmp->b_count) // 正在使用
             continue;
         if (!bh || BADNESS(tmp) < BADNESS(bh))
         {
@@ -287,6 +287,7 @@ struct buffer_head *bread(int dev, int block)
  * Ok, breada can be used as bread, but additionally to mark other
  * blocks for reading as well. End the argument list with a negative
  * number.
+ * 这个函数其实是读取第一个块的缓冲区，并从硬盘预读第二、三...个块的数据到缓冲区中
  */
 struct buffer_head *breada(int dev, int first, ...)
 {
@@ -296,7 +297,7 @@ struct buffer_head *breada(int dev, int first, ...)
     va_start(args, first);
     if (!(bh = getblk(dev, first)))
         panic("bread: getblk returned NULL\n");
-    if (!bh->b_uptodate)
+    if (!bh->b_uptodate)     /* 如果缓冲块的数据不是最新的 */
         ll_rw_block(READ, bh);
     while ((first = va_arg(args, int)) >= 0)
     {
@@ -319,7 +320,7 @@ struct buffer_head *breada(int dev, int first, ...)
 void buffer_init(long buffer_end)
 {
     struct buffer_head *h = start_buffer;
-    void *b;
+    void *b;  /* b 是数据区，磁盘中的一个block块与数据区中的某一块对应，b 也是 buffer_head 中的一个字段 */
     int i;
 
     if (buffer_end == 1 << 20)     // 1MB

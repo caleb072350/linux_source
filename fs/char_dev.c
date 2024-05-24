@@ -6,13 +6,14 @@
 
 #include "../include/errno.h"
 #include "../include/sys/types.h"
-
+#include "../include/linux/fs.h"
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
 
 #include "../include/asm/segment.h"
 #include "../include/asm/io.h"
 
+/* minor 用于区分同一类设备的不同实例 */
 extern int tty_read(unsigned minor, char *buf, int count);
 extern int tty_write(unsigned minor, char *buf, int count);
 

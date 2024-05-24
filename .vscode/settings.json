@@ -21,6 +21,7 @@
         "mm.h": "c",
         "termios.h": "c",
         "io.h": "c",
-        "config.h": "c"
+        "config.h": "c",
+        "system_error": "c"
     }
 }

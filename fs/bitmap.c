@@ -48,7 +48,7 @@ void free_block(int dev, int block)
     struct super_block *sb;
     struct buffer_head *bh;
 
-    if (!(sb = get_super(dev))) // 获取硬件设备的super_block块，如果失败则触发panic
+    if (!(sb = get_super(dev))) // 获取硬件设备的超级块，如果失败则触发panic
         panic("trying to free block on nonexistent device");
     if (block < sb->s_firstdatazone || block >= sb->s_nzones) /* 校验待释放的block块是否在数据区 */
         panic("trying to free block not in datazone");
@@ -86,7 +86,7 @@ int new_block(int dev)
     j = 8192;
     for (i = 0; i < 8; i++)
         if (bh = sb->s_zmap[i])
-            if ((j = find_first_zero(bh->b_data)) < 8192)
+            if ((j = find_first_zero(bh->b_data)) < 8192)       // bh->b_data 一共有8192个bit位，即1024个byte(char)
                 break;
     if (i >= 8 || !bh || j >= 8192)
         return 0;
@@ -107,6 +107,7 @@ int new_block(int dev)
     return j;
 }
 
+/* inode 主要是文件或文件夹的一种系统资源 */
 void free_inode(struct m_inode *inode)
 {
     struct super_block *sb;
@@ -114,17 +115,17 @@ void free_inode(struct m_inode *inode)
 
     if (!inode)
         return;
-    if (!inode->i_dev)
+    if (!inode->i_dev) /*  一个有效的inode一定指向某个dev设备 */
     {
         memset(inode, 0, sizeof(*inode));
         return;
     }
-    if (inode->i_count > 1)
+    if (inode->i_count > 1) /* 有其他进程也在使用这个inode */
     {
         printk("trying to free inode with count=%d\n", inode->i_count);
         panic("free_inode");
     }
-    if (inode->i_nlinks)
+    if (inode->i_nlinks) /* 有其他硬链接指向这个inode */
         panic("trying to free inode with links");
     if (!(sb = get_super(inode->i_dev)))
         panic("trying to free inode on nonexistent device");

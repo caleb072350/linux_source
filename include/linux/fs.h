@@ -29,7 +29,7 @@
 
 void buffer_init(long buffer_end);
 
-#define MAJOR(a) (((unsigned)(a)) >> 8)
+#define MAJOR(a) (((unsigned)(a)) >> 8)  /* Linux 内核中，设备号由主设备号和次设备号组成，用于唯一标识设备，主设备号区分设备的类别，次设备号区分同类下的实例 */
 #define MINOR(a) ((a) & 0xff)
 
 #define NAME_LEN 14
@@ -93,26 +93,26 @@ struct d_inode
 
 struct m_inode
 {
-    unsigned short i_mode;
-    unsigned short i_uid;
-    unsigned long i_size;
-    unsigned long i_mtime;
-    unsigned char i_gid;
-    unsigned char i_nlinks;
-    unsigned short i_zone[9];
+    unsigned short i_mode; /* 文件或目录的访问权限信息 */
+    unsigned short i_uid;  /* 文件或目录的所有者 */
+    unsigned long i_size;  /* 文件大小 */
+    unsigned long i_mtime; /* 文件或目录的修改时间 */
+    unsigned char i_gid;   /* 组ID */
+    unsigned char i_nlinks;   /* 指向该inode的硬链接数 */
+    unsigned short i_zone[9]; /* 存储文件数据块的索引数组 */
     /* these are in memory also */
-    struct task_struct *i_wait;
-    unsigned long i_atime;
-    unsigned long i_ctime;
-    unsigned short i_dev;
-    unsigned short i_num;
-    unsigned short i_count;
-    unsigned char i_lock;
-    unsigned char i_dirt;
-    unsigned char i_pipe;
-    unsigned char i_mount;
-    unsigned char i_seek;
-    unsigned char i_update;
+    struct task_struct *i_wait; /* 等待该inode的进程队列头指针 */
+    unsigned long i_atime;   /* 最近的访问时间 */
+    unsigned long i_ctime;   /* 创建时间 */
+    unsigned short i_dev;    /* 设备号 */
+    unsigned short i_num;    /* inode号码，该inode在系统中的唯一标识 */
+    unsigned short i_count;  /* 有多少进程在使用该inode */
+    unsigned char i_lock;    /* 锁状态 */
+    unsigned char i_dirt;    /* 是否被修改 */
+    unsigned char i_pipe;    /* 是否为管道 */
+    unsigned char i_mount;   /* 是否为挂载点 */
+    unsigned char i_seek;    /* 文件读写指针的位置 */
+    unsigned char i_update;  /* 是否需要更新 */
 };
 
 struct file
