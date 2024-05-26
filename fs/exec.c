@@ -8,7 +8,7 @@
 #include "../include/string.h"
 #include "../include/sys/stat.h"
 #include "../include/a.out.h"
-
+#include "../include/linux/fs.h"
 #include "../include/linux/fs.h"
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
@@ -54,12 +54,13 @@ int read_head(struct m_inode *inode, int blocks)
             continue;
         if (!(bh = bread(inode->i_dev, inode->i_zone[count + 1])))
             return -1;
-        cp_block(bh->b_data, count * BLOCK_SIZE);
+        cp_block(bh->b_data, count * BLOCK_SIZE);  /* 将数据从硬盘的block块对应的buffer_head的b_data字段拷贝到内存，以1024字节为单位 */
         brelse(bh);
     }
     return 0;
 }
 
+/* 从间接块读取数据 dev-设备号 ind-间接块的块号 size-读取的数据大小 offset-内存的偏移位置 */
 int read_ind(int dev, int ind, long size, unsigned long offset)
 {
     struct buffer_head *ih, *bh;
@@ -126,6 +127,9 @@ int read_area(struct m_inode *inode, long size)
  * create_tables() parses the env- and arg-strings in new user
  * memory and creates the pointer tables from them, and puts their
  * addresses on the "stack", returning the new stack pointer value.
+ * 解析新用户空间的环境字符串和参数字符串，并从中创建指针表，并把他们放入
+ * “堆栈”，并返回新的堆栈指针值。p指向用户空间环境字符串和参数字符串的指针
+ * argc - 参数数量  envc - 环境变量的数量
  */
 static unsigned long *create_tables(char *p, int argc, int envc)
 {
@@ -133,10 +137,10 @@ static unsigned long *create_tables(char *p, int argc, int envc)
     unsigned long *sp;
 
     sp = (unsigned long *)(0xfffffffc & (unsigned long)p);
-    sp -= envc + 1;
-    envp = sp;
+    sp -= envc + 1; /* 因为最后一个环境变量的后面用0填充，所以多一个 */
+    envp = sp; /* 环境变量表指针 */
     sp -= argc + 1;
-    argv = sp;
+    argv = sp;  /* 参数变量表指针 */
     put_fs_long((unsigned long)envp, --sp);
     put_fs_long((unsigned long)argv, --sp);
     put_fs_long((unsigned long)argc, --sp);
@@ -245,20 +249,23 @@ static unsigned long copy_strings(int argc, char **argv, unsigned long *page,
     return p;
 }
 
+/* 这段代码的作用是在操作系统中更改局部描述符表(Local Descriptor Table, LDT),主要用于设置代码段和
+ * 数据段的基址和限长，并确保文件系统指向新的数据段
+ */
 static unsigned long change_ldt(unsigned long text_size, unsigned long *page)
 {
     unsigned long code_limit, data_limit, code_base, data_base;
     int i;
 
-    code_limit = text_size + PAGE_SIZE - 1;
-    code_limit &= 0xFFFFF000;
-    data_limit = 0x4000000;
-    code_base = get_base(current->ldt[1]);
-    data_base = code_base;
-    set_base(current->ldt[1], code_base);
-    set_limit(current->ldt[1], code_limit);
-    set_base(current->ldt[2], data_base);
-    set_limit(current->ldt[2], data_limit);
+    code_limit = text_size + PAGE_SIZE - 1; /* 计算代码段限长*/
+    code_limit &= 0xFFFFF000;  /* 按照页面对齐进行截断 */
+    data_limit = 0x4000000;      /* 设置数据段限长 */
+    code_base = get_base(current->ldt[1]); /* 获取当前进程的代码段基址 */
+    data_base = code_base; /* 将数据段基址设置为与代码段基址相同 */
+    set_base(current->ldt[1], code_base); /* 设置当前进程的代码段基址 */
+    set_limit(current->ldt[1], code_limit); /* 设置当前进程的代码段限长 */
+    set_base(current->ldt[2], data_base);  /* 设置当前进程的数据段基址 */
+    set_limit(current->ldt[2], data_limit); /* 设置当前进程的数据段限长 */
     /* make sure fs points to the NEW data segment */
     __asm__("pushl $0x17\n\tpop %%fs" ::);
     data_base += data_limit;

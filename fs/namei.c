@@ -7,7 +7,7 @@
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
 #include "../include/asm/segment.h"
-
+#include "../include/linux/fs.h"
 #include "../include/string.h"
 #include "../include/fcntl.h"
 #include "../include/errno.h"
@@ -85,7 +85,7 @@ static int match(int len, const char *name, struct dir_entry *de)
  * over a pseudo-root and a mount point.
  */
 static struct buffer_head *find_entry(struct m_inode **dir,
-                                      const char *name, int namelen, struct dir_entry **res_dir)
+    const char *name, int namelen, struct dir_entry **res_dir)
 {
     int entries;
     int block, i;
