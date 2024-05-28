@@ -7,7 +7,7 @@
 #include "../include/string.h"
 #include "../include/errno.h"
 #include "../include/sys/stat.h"
-
+#include "../include/linux/fs.h"
 #include "../include/linux/sched.h"
 
 extern int tty_ioctl(int dev, int cmd, int arg);

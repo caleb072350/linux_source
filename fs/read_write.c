@@ -4,13 +4,13 @@
  *  (C) 1991  Linus Torvalds
  */
 
-#include <sys/stat.h>
-#include <errno.h>
-#include <sys/types.h>
-
-#include <linux/kernel.h>
-#include <linux/sched.h>
-#include <asm/segment.h>
+#include "../include/sys/stat.h"
+#include "../include/errno.h"
+#include "../include/sys/types.h"
+#include "../include/linux/fs.h"
+#include "../include/linux/kernel.h"
+#include "../include/linux/sched.h"
+#include "../include/asm/segment.h"
 
 extern int rw_char(int rw, int dev, char *buf, int count, off_t *pos);
 extern int read_pipe(struct m_inode *inode, char *buf, int count);

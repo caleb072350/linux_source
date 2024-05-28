@@ -5,7 +5,7 @@
  */
 
 #include "../include/linux/sched.h"
-
+#include "../include/linux/fs.h"
 #include "../include/sys/stat.h"
 
 static void free_ind(int dev, int block)

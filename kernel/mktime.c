@@ -4,7 +4,7 @@
  *  (C) 1991  Linus Torvalds
  */
 
-#include <time.h>
+#include "../include/time.h"
 
 /*
  * This isn't the library routine, it is only used in the kernel.

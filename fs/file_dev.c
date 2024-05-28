@@ -4,12 +4,12 @@
  *  (C) 1991  Linus Torvalds
  */
 
-#include <errno.h>
-#include <fcntl.h>
-
-#include <linux/sched.h>
-#include <linux/kernel.h>
-#include <asm/segment.h>
+#include "../include/errno.h"
+#include "../include/fcntl.h"
+#include "../include/linux/fs.h"
+#include "../include/linux/sched.h"
+#include "../include/linux/kernel.h"
+#include "../include/asm/segment.h"
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))

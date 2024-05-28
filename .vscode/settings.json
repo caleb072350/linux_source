@@ -22,6 +22,8 @@
         "termios.h": "c",
         "io.h": "c",
         "config.h": "c",
-        "system_error": "c"
+        "system_error": "c",
+        "random": "c",
+        "types.h": "c"
     }
 }

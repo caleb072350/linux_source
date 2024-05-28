@@ -5,10 +5,11 @@
  */
 
 #include "../include/signal.h"
-
+#include "../include/linux/fs.h"
 #include "../include/sched.h"
 #include "../include/linux/mm.h" /* for get_free_page */
 #include "../include/asm/segment.h"
+#include "../include/linux/sched.h"
 
 int read_pipe(struct m_inode *inode, char *buf, int count)
 {

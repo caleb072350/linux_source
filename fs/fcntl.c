@@ -9,7 +9,7 @@
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
 #include "../include/asm/segment.h"
-
+#include "../include/linux/fs.h"
 #include "../include/fcntl.h"
 #include "../include/sys/stat.h"
 

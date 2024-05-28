@@ -11,7 +11,7 @@
  * management can be a bitch. See 'mm/mm.c': 'copy_page_tables()'
  */
 #include "../include/errno.h"
-
+#include "../include/linux/fs.h"
 #include "../include/linux/sched.h"
 #include "../include/linux/kernel.h"
 #include "../include/asm/segment.h"
